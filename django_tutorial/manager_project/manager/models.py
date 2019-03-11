@@ -51,10 +51,10 @@ class Manager(models.Model):
     DEP_IS = 50
 
 class Worker(models.Model):
-    person = models.ForeignKey('Person')
+    person = models.ForeignKey('Person', 'on_delete')
     #when he/she was belonged to here
     joined_at = models.DateTimeField()
     #when he/she quited
     quited_at = models.DateTimeField(null=True, blank=True)
     #his/her boss
-    manager = models.ForeignKey('Manager')
+    manager = models.ForeignKey('Manager', 'on_delete')
