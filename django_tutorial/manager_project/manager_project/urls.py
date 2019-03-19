@@ -16,6 +16,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+import manager.views as manager_view
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    url(r'^worker_list/', manager_view.WorkerListView.as_view()) # combine url and view
 ]
