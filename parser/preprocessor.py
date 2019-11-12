@@ -17,10 +17,10 @@ def to_some_feature(sentence: str):
     # TODO: determine featurization process and do it
     pass
 
-def convert_df_to_feature(df: DataFrame) -> RDD:
+def convert_df_to_feature(df: DataFrame) -> DataFrame:
     feature_df = df.rdd.map(
         lambda row: row_to_feature(row)
-    )
+    ).toDF()
 
     return feature_df
 
