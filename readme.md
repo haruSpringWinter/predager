@@ -1,8 +1,12 @@
+# predager
+Predict age from sentences
+
+### Verified environments
+* MacOS 10.13
+* Python 3.7.0
+
 # How to setup environment
-
 Clone this repository and then `pip install -r pyp_list.txt` under the project.
-
-## Requirements
 
 Basically refer `pyp_list.txt`.
 Sometimes, you need initial settings to install module such as matplotlib and pyspark.

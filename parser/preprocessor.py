@@ -31,4 +31,5 @@ def row_to_feature(row: Row) -> Row:
     sex = row['sex']
     morph = to_morph(sentence)
 
-    Row(('age', age), ('sex', sex), ('feat', morph))
+    feature_row = Row(('age', age), ('sex', sex), ('feat', morph))
+    return feature_row
