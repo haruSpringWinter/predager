@@ -13,7 +13,7 @@ conf = SparkConf().setAll(
         ]
     )
 sc = SparkContext(conf = conf)
-ss = SparkSession(sc)
+ss = SparkSession(sc).builder.master('local[*]').getOrCreate()
 
 # age,sex,sentence,ur
 twitter_schema = StructType([
