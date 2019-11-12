@@ -26,7 +26,7 @@ def convert_df_to_feature(df: DataFrame) -> DataFrame:
 
 # Row(age, sex, sentence, url)
 def row_to_feature(row: Row) -> Row:
-    sentence = row['sencence']
+    sentence = row['sentence']
     age = row['age']
     sex = row['sex']
     morph = to_morph(sentence)
