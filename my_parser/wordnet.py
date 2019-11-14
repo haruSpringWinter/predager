@@ -1,0 +1,1 @@
+# TODO: https://github.com/katryo/wordnet_pythonからコード持ってくる
