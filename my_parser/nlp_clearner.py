@@ -4,7 +4,8 @@ from bs4 import BeautifulSoup
 
 
 def clean_text(text: str) -> str:
-    replaced_text = '\n'.join(s.strip() for s in text.splitlines()[2:] if s != '')  # skip header by [2:]
+    # replaced_text = '\n'.join(s.strip() for s in text.splitlines()[2:] if s != '')  # skip header by [2:]
+    replaced_text = '\n'.join(text.splitlines())  # skip header by [2:]
     replaced_text = replaced_text.lower()
     replaced_text = re.sub(r'[【】]', ' ', replaced_text)       # 【】の除去
     replaced_text = re.sub(r'[（）()]', ' ', replaced_text)     # （）の除去
@@ -50,3 +51,19 @@ def clean_code(html_text: str) -> str:
     cleaned_text = soup.get_text()
     cleaned_text = ''.join(cleaned_text.splitlines())
     return cleaned_text
+
+if __name__ == "__main__":
+    print("abcdefg".splitlines()[2:])
+
+    example_txts = [
+        "@picachu 草でチュウ",
+        "This is url http://hoge.com",
+        "year <span color=\"red\"> wvec </span>",
+        "normal"
+    ]
+
+    cleaned_txts = [clean_text(txt) for txt in example_txts]
+
+    for txt, cleaned in zip(example_txts, cleaned_txts):
+        print(txt)
+        print(cleaned)

@@ -1,6 +1,7 @@
 import re
 import unicodedata
 
+
 import nltk
 from nltk.corpus import wordnet
 
@@ -43,3 +44,9 @@ def normalize_number(text):
     # 連続した数字を0で置換
     replaced_text = re.sub(r'\d+', '0', text)
     return replaced_text
+
+if __name__ == "__main__":
+    example_txt = "Hello!! My name is 細馬. I WANNA BE THE COOL GUY 000000."
+    normalized = normalize(example_txt)
+    print("example:    " + example_txt)
+    print("normalized: " + normalized)
