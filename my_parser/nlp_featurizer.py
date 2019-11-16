@@ -41,15 +41,17 @@ def convert_df_to_feature(df: DataFrame) -> RDD:
     return feature_rdd
 
 '''
-識別モデル構築の流れ (参考：https://qiita.com/MahoTakara/items/b3d719ed1a3665730826)
+識別モデル構築の流れ (参考：https://qiita.com/MahoTakara/items/b3d719ed1a3665730826, https://qiita.com/Hironsan/items/2466fe0f344115aff177)
 
-1. DONE: 単語分割
-2. DONE: 形態素解析
-3. TODO: 辞書作成 (単語とIDの対応づけ)
-4. TODO: ベクトル化 (埋め込み or IDからone-hot)
-5. TODO: 文章特徴抽出 (文章の長さなど) 
-6. TODO: 提案特徴抽出 (フォロー/フォロワーの特徴)
-7. TODO: 識別モデルの実装
-8. TODO: 評価メトリクスの実装
-9. TODO: 実験実行
+1.  DONE: 単語分割
+2.  DONE: 形態素解析
+3.  TODO: クリーニング
+4.  TODO: 正規化
+5.  TODO: 辞書作成 (単語とIDの対応づけ)
+6.  TODO: ベクトル化 (埋め込み or IDからone-hot)
+7.  TODO: 文章特徴抽出 (文章の長さなど) 
+8.  TODO: 提案特徴抽出 (フォロー/フォロワーの特徴)
+9.  TODO: 識別モデルの実装
+10. TODO: 評価メトリクスの実装
+11. TODO: 実験実行
 '''
