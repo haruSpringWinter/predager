@@ -45,8 +45,8 @@ def convert_df_to_feature(df: DataFrame) -> RDD:
 
 1.  DONE: 単語分割
 2.  DONE: 形態素解析
-3.  TODO: クリーニング
-4.  TODO: 正規化
+3.  DONE: クリーニング
+4.  DONE: 正規化 (ストップワードの除去含む)
 5.  TODO: 辞書作成 (単語とIDの対応づけ)
 6.  TODO: ベクトル化 (埋め込み or IDからone-hot)
 7.  TODO: 文章特徴抽出 (文章の長さなど) 
