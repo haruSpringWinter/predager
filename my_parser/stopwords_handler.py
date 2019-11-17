@@ -24,6 +24,17 @@ def maybe_download(path: str) -> None:
         urllib.request.urlretrieve(url, path)
 
 
+'''
+Remove nodes Tuple(surface, feature) which are in stopwords list
+'''
+def remove_stopnodes(nodes: list, swlist: list = None) -> list:
+    global stopwords
+    if swlist == None:
+        swlist = stopwords
+    nodes = [node for node in nodes if node[0] not in swlist]
+    return nodes
+ 
+
 def remove_stopwords(words: list, swlist: list = None) -> list:
     global stopwords
     if swlist == None:
