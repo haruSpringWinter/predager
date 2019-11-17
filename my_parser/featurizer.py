@@ -6,7 +6,7 @@ from gensim.corpora import Dictionary
 
 from . import normalizer, stopwords_handler, clearner
 
-dct = Dictionary()
+global_dict = Dictionary()
 
 def to_morph(sentence: str) -> list:
     m = MeCab.Tagger("-Ochasen")
@@ -24,26 +24,16 @@ def to_morph(sentence: str) -> list:
     return node_list
 
 
-def update_dictionary(nodes: list) -> None:
-    global dct
-
-    surfaces = []
-    for node in nodes:
-        surfaces.append(node[0])
-    dct.add_documents([surfaces])    
-
-
-def preprocess(row: Row, n: int = 10, min_freq: int = 1, for_test = False) -> tuple:
+def preprocess(row: Row, n: int = 10, min_freq: int = 1, for_test: bool = False, dic: dict = None) -> tuple:
     sentence = row['sentence']
     clean_text = clearner.clean_text(sentence)
     normalized_text = normalizer.normalize(clean_text)
     nodes = to_morph(normalized_text)
 
     if for_test:
-        nodes = [node for node in nodes if node[0] in dct]
+        nodes = [node for node in nodes if node[0] in dic]
 
     cleaned_nodes = stopwords_handler.remove_stopnodes(nodes)
-    update_dictionary(cleaned_nodes)
 
     age = row['age']
     sex = row['sex']
@@ -54,32 +44,52 @@ def preprocess(row: Row, n: int = 10, min_freq: int = 1, for_test = False) -> tu
     return preprocessed
 
 
-def convert_row_to_feature_vec(row: tuple) -> tuple:
-    dim = len(dct)
+def convert_row_to_feature_vec(row: tuple, dic: dict) -> tuple:
+    dim = len(dic)
     nodes = row[2]
     terms = [node[0] for node in nodes]
     vecs = []
     for term in terms:
         vec = [0 for i in range(dim)]
-        vec[dct.token2id[term]] += 1
+        vec[dic.token2id[term]] += 1
         vecs.append(vec)
     # TODO: Add some features
     
     return (row[0], row[1], vecs)
 
+# Unused
+# def update_dictionary(nodes: list) -> None:
+#     global global_dict
 
-def convert_df_to_feature(df: DataFrame, n: int = 10, min_freq: int = 1, for_test = False) -> RDD:
+#     surfaces = []
+#     for node in nodes:
+#         surfaces.append(node[0])
+#     global_dict.add_documents([surfaces])    
+
+
+def convert_df_to_feature(df: DataFrame, n: int = 10, min_freq: int = 1, for_test = False, dic: dict = None) -> RDD:
+    global global_dict
     preproc_rdd = df.rdd.filter(
         lambda row: row['sentence'] != None
     ).map(
-        lambda row: preprocess(row, n, min_freq, for_test)
+        lambda row: preprocess(row, n, min_freq, for_test, dic)
     )
 
-    print(preproc_rdd.count())
-    print(dct)
+    # 特徴量化時にRDDなめるのと同時にDictを更新しようとするとうまくいかないので個別に更新.
+    # 並列処理の時にはglobal変数の更新はうまくいかないっぽい．
+    # https://stackoverflow.com/questions/44921837/how-to-update-a-global-variable-inside-rdd-map-operation
+    if not for_test:
+        def get_vocab(x: tuple) -> list:
+            # (age, sex, clean_nodes)
+            nodes = x[2]
+            return [node[0] for node in nodes]
+        vocab = preproc_rdd.map(
+            lambda x:  get_vocab(x)
+        ).collect()
+        global_dict.add_documents(vocab)
 
     feature_rdd = preproc_rdd.map(
-        lambda row: convert_row_to_feature_vec(row)
+        lambda row: convert_row_to_feature_vec(row, global_dict)
     )
 
     return feature_rdd
