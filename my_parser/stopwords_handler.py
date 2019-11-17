@@ -5,6 +5,14 @@ from collections import Counter
 
 from gensim import corpora
 
+pwd = os.path.dirname(os.path.abspath(__file__))
+stopwords = []
+
+with open(pwd + '/stopwords.txt', 'r') as f:
+    for line in f:
+        if line != '':
+            stopwords.append(str(line.strip()))
+
 
 def maybe_download(path: str) -> None:
     url = 'http://svn.sourceforge.jp/svnroot/slothlib/CSharp/Version1/SlothLib/NLP/Filter/StopWord/word/Japanese.txt'
