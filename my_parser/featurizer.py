@@ -69,7 +69,7 @@ if __name__ == "__main__":
     df = load_as_df(path)
     df.show(3)
 
-    converted = featurizer.convert_df_to_feature(df)
+    converted = convert_df_to_feature(df)
     sample = converted.take(3)
     for e in sample:
         print(e)
