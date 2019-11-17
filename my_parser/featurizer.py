@@ -1,6 +1,6 @@
 import MeCab
 import numpy as np
-import normalizer, stopwords_handler
+import normalizer, stopwords_handler, clearner
 from pyspark import RDD
 from pyspark.sql import DataFrame, Row
 
@@ -23,9 +23,12 @@ def to_morph(sentence: str) -> list:
 
 def row_to_feature(row: Row) -> tuple:
     sentence = row['sentence']
+    clean_text = clearner.clean_text(sentence)
+    normalized_text = normalizer.normalize(clean_text)
+    # TODO: eliminate stopwords
     age = row['age']
     sex = row['sex']
-    nodes = to_morph(sentence)
+    nodes = to_morph(normalized_text)
 
     # feature_row = Row(('age', age), ('sex', sex), ('feat', morph))
     feature_row = (age, sex, nodes)
