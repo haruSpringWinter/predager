@@ -17,6 +17,7 @@ def lr_example():
 
     converted = featurizer.convert_df_to_feature(df, n_common, min_freq)
     converted = converted.map(
+        # (age, sex, sentences)
         lambda x: LabeledPoint(x[0], concat_vectors(x[2]))
     )
     converted = converted.zipWithIndex()
@@ -31,27 +32,37 @@ def lr_example():
         lambda x: x[0]
     )
 
+    feature_dim = len(train_rdd.first().features)
+
     test_rdd = converted.filter(
         lambda x: x[1] % 2 == 1
     ).map(
         lambda x: x[0]
-    )
+    ).filter(
+        lambda x: len(x.features) == feature_dim
+    ).collect()
 
     print("confirming dim of train rdd")
-    sample = train_rdd.take(10)
-    for e in sample:
-        print(len(e.features))
-
-    print("confirming dim of test rdd")
-    sample = test_rdd.take(10)
+    sample = train_rdd.take(3)
     for e in sample:
         print(len(e.features))
 
     # 線型回帰モデルの学習
     lrm = LinearRegressionWithSGD.train(train_rdd)
+    n = len(test_rdd)
 
+    mse = 0
     # テスト
-    lrm.predict(test_rdd)
+    for lp in test_rdd:
+        gt = lp.label
+        feat = lp.features
+        pred = lrm.predict(feat)
+        mse += (pred - gt) * (pred - gt)
+
+    import math
+    rmse = math.sqrt(mse / n)
+
+    print('Root mean square error: ' + str(rmse))
 
 
 def concat_vectors(vecs: list):
