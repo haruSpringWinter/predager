@@ -21,17 +21,18 @@ def to_morph(sentence: str) -> list:
     return node_list
 
 
-def row_to_feature(row: Row) -> tuple:
+def row_to_feature(row: Row, n: int = 100, min_freq: int = 1) -> tuple:
     sentence = row['sentence']
     clean_text = clearner.clean_text(sentence)
     normalized_text = normalizer.normalize(clean_text)
-    # TODO: eliminate stopwords
+    nodes = to_morph(normalized_text)
+    cleaned = stopwords_handler.remove_stopnodes(nodes)
+
     age = row['age']
     sex = row['sex']
-    nodes = to_morph(normalized_text)
 
     # feature_row = Row(('age', age), ('sex', sex), ('feat', morph))
-    feature_row = (age, sex, nodes)
+    feature_row = (age, sex, cleaned)
 
     return feature_row
 
@@ -53,7 +54,7 @@ def convert_df_to_feature(df: DataFrame) -> RDD:
 2.  DONE: 形態素解析
 3.  DONE: クリーニング
 4.  DONE: 正規化 (ストップワードの除去含む)
-5.  TODO: 辞書作成 (単語とIDの対応づけ)
+5.  TODO: 辞書作成 (単語とIDの対応づけ) https://qiita.com/tatsuya-miyamoto/items/f505dfa8d5307f8c6e98　簡単にできそう
 6.  TODO: ベクトル化 (埋め込み or IDからone-hot)
 7.  TODO: 文章特徴抽出 (文章の長さなど) 
 8.  TODO: 提案特徴抽出 (フォロー/フォロワーの特徴)
