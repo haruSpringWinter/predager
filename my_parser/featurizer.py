@@ -1,9 +1,13 @@
 import MeCab
 import numpy as np
-import normalizer, stopwords_handler, clearner
 from pyspark import RDD
 from pyspark.sql import DataFrame, Row
 from gensim.corpora import Dictionary
+
+import os, sys
+pwd = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(pwd)
+import normalizer, stopwords_handler, clearner
 
 dct = Dictionary()
 
