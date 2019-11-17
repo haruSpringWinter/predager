@@ -1,5 +1,6 @@
 import MeCab
 import numpy as np
+import normalizer, stopwords_handler
 from pyspark import RDD
 from pyspark.sql import DataFrame, Row
 
@@ -24,9 +25,10 @@ def row_to_feature(row: Row) -> tuple:
     sentence = row['sentence']
     age = row['age']
     sex = row['sex']
-    morph = to_morph(sentence)
+    nodes = to_morph(sentence)
+
     # feature_row = Row(('age', age), ('sex', sex), ('feat', morph))
-    feature_row = (age, sex, morph)
+    feature_row = (age, sex, nodes)
 
     return feature_row
 
@@ -39,6 +41,7 @@ def convert_df_to_feature(df: DataFrame) -> RDD:
     )
 
     return feature_rdd
+
 
 '''
 識別モデル構築の流れ (参考：https://qiita.com/MahoTakara/items/b3d719ed1a3665730826, https://qiita.com/Hironsan/items/2466fe0f344115aff177)

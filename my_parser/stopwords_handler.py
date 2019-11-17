@@ -2,7 +2,6 @@ import os
 import urllib.request
 import itertools
 from collections import Counter
-from nlp_featurizer import to_morph
 
 from gensim import corpora
 
@@ -50,6 +49,8 @@ def get_stop_words(docs: list, n: int = 100, min_freq: int = 1):
     return stopwords
 
 if __name__ == "__main__":
+    from featurizer import to_morph
+
     sentences = [
         "出現頻度による方式では、テキスト内の単語頻度をカウントし、高頻度(時には低頻度)の単語をテキストから除去します。高頻度の単語を除去するのは、それらの単語がテキスト中で占める割合が高い一方、役に立たないからです。以下の図はある英語の本の最も頻出する50単語の累計頻度をプロットしたものです:",
         "50単語を見てみると、the や of、カンマのような文書分類等に役に立たなさそうな単語がテキストの50%近くを占めていることがわかります。出現頻度による方式ではこれら高頻度語をストップワードとしてテキストから取り除きます。",
