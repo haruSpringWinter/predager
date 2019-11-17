@@ -8,7 +8,6 @@ from . import normalizer, stopwords_handler, clearner
 
 dct = Dictionary()
 
-
 def to_morph(sentence: str) -> list:
     m = MeCab.Tagger("-Ochasen")
     node = m.parseToNode(sentence)
@@ -31,12 +30,10 @@ def update_dictionary(nodes: list) -> None:
     surfaces = []
     for node in nodes:
         surfaces.append(node[0])
-
     dct.add_documents([surfaces])    
 
 
-def preprocess(row: Row, n: int = 100, min_freq: int = 1, for_test = False) -> tuple:
-    global dct
+def preprocess(row: Row, n: int = 10, min_freq: int = 1, for_test = False) -> tuple:
     sentence = row['sentence']
     clean_text = clearner.clean_text(sentence)
     normalized_text = normalizer.normalize(clean_text)
@@ -58,8 +55,6 @@ def preprocess(row: Row, n: int = 100, min_freq: int = 1, for_test = False) -> t
 
 
 def convert_row_to_feature_vec(row: tuple) -> tuple:
-    global dct
-
     dim = len(dct)
     nodes = row[2]
     terms = [node[0] for node in nodes]
@@ -73,11 +68,11 @@ def convert_row_to_feature_vec(row: tuple) -> tuple:
     return (row[0], row[1], vecs)
 
 
-def convert_df_to_feature(df: DataFrame, for_test = False) -> RDD:
+def convert_df_to_feature(df: DataFrame, n: int = 10, min_freq: int = 1, for_test = False) -> RDD:
     preproc_rdd = df.rdd.filter(
         lambda row: row['sentence'] != None
     ).map(
-        lambda row: preprocess(row)
+        lambda row: preprocess(row, n, min_freq, for_test)
     )
 
     feature_rdd = preproc_rdd.map(
