@@ -20,6 +20,11 @@ def lr_example():
         lambda x: LabeledPoint(x[0], concat_vectors(x[2]))
     )
     converted = converted.zipWithIndex()
+
+    sample = converted.take(3)
+    for e in sample:
+        print(len(e[0].features))
+
     train_rdd = converted.filter(
         lambda x: x[1] % 2 == 0
     ).map(
@@ -32,9 +37,15 @@ def lr_example():
         lambda x: x[0]
     )
 
-    sample = train_rdd.take(3)
+    print("confirming dim of train rdd")
+    sample = train_rdd.take(10)
     for e in sample:
-        print(e)
+        print(len(e.features))
+
+    print("confirming dim of test rdd")
+    sample = test_rdd.take(10)
+    for e in sample:
+        print(len(e.features))
 
     # 線型回帰モデルの学習
     lrm = LinearRegressionWithSGD.train(train_rdd)

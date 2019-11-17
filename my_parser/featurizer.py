@@ -75,6 +75,9 @@ def convert_df_to_feature(df: DataFrame, n: int = 10, min_freq: int = 1, for_tes
         lambda row: preprocess(row, n, min_freq, for_test)
     )
 
+    print(preproc_rdd.count())
+    print(dct)
+
     feature_rdd = preproc_rdd.map(
         lambda row: convert_row_to_feature_vec(row)
     )
