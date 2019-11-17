@@ -29,14 +29,7 @@ def load_as_df(path: str) -> DataFrame:
 
 if __name__ == "__main__":
     import os
-    import featurizer
-
     pwd = os.path.dirname(os.path.abspath(__file__))
     path = pwd + '/../example_data/20190528sentences_data_integrated.csv'
     df = load_as_df(path)
     df.show(3)
-
-    converted = featurizer.convert_df_to_feature(df)
-    sample = converted.take(3)
-    for e in sample:
-        print(e)

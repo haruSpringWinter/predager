@@ -58,3 +58,18 @@ def convert_df_to_feature(df: DataFrame) -> RDD:
 10. TODO: 評価メトリクスの実装
 11. TODO: 実験実行
 '''
+
+
+if __name__ == "__main__":
+    import os
+    pwd = os.path.dirname(os.path.abspath(__file__))
+    from csv_parser import load_as_df
+
+    path = pwd + '/../example_data/20190528sentences_data_integrated.csv'
+    df = load_as_df(path)
+    df.show(3)
+
+    converted = featurizer.convert_df_to_feature(df)
+    sample = converted.take(3)
+    for e in sample:
+        print(e)
