@@ -57,6 +57,7 @@ def lr_example():
         gt = lp.label
         feat = lp.features
         pred = lrm.predict(feat)
+        print(gt, pred)
         mse += (pred - gt) * (pred - gt)
 
     import math
