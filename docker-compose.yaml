@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  main: 
+    image: predager_main
+    build:
+      context: ./Dockerfiles
+    command: python3 -u linear_regression_example.py
+    volumes:
+      - .:/app
+    ports:
+      - "9080:9080"
