@@ -25,6 +25,10 @@ def to_morph(sentence: str) -> list:
 
 
 def preprocess(row: Row, n: int = 10, min_freq: int = 1, for_test: bool = False, dic: dict = None) -> tuple:
+    '''
+    文章の不要語の除去，正規化，形態素解析を行い，結果としてラベル(年齢/性別)とデータのタプルを返す．
+    タプルじゃなくてRowなどにして文字列アクセスするようにした方が後々見やすい気がする．
+    '''
     sentence = row['sentence']
     clean_text = clearner.clean_text(sentence)
     normalized_text = normalizer.normalize(clean_text)
@@ -43,16 +47,21 @@ def preprocess(row: Row, n: int = 10, min_freq: int = 1, for_test: bool = False,
 
     return preprocessed
 
-
 def convert_row_to_feature_vec(row: tuple, dic: dict) -> tuple:
+    '''
+    一行のデータを特徴量化するコード．
+    '''
     dim = len(dic)
     nodes = row[2]
     terms = [node[0] for node in nodes]
     vecs = []
     for term in terms:
-        vec = [0 for i in range(dim)]
-        vec[dic.token2id[term]] += 1
-        vecs.append(vec)
+        # いくつかの単語が登録されずにエラーを起こすのでif文でフィルタリングする
+        # one-hotエンコーディング
+        if term in dic:
+            vec = [0 for i in range(dim)]
+            vec[dic.token2id[term]] += 1
+            vecs.append(vec)
     # TODO: Add some features
     
     return (row[0], row[1], vecs)
@@ -72,6 +81,7 @@ def convert_df_to_feature(df: DataFrame, n: int = 10, min_freq: int = 1, for_tes
     preproc_rdd = df.rdd.filter(
         lambda row: row['sentence'] != None
     ).map(
+        # TODO: preprocの結果をタプルで返していてアクセスの見通しが悪いのでRowに保存するようにする
         lambda row: preprocess(row, n, min_freq, for_test, dic)
     )
 
