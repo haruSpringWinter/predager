@@ -24,7 +24,7 @@ def to_morph(sentence: str) -> list:
     return node_list
 
 
-def preprocess(row: Row, n: int = 10, min_freq: int = 1, for_test: bool = False, dic: dict = None) -> tuple:
+def preprocess(row: Row, n: int = 10, min_freq: int = 1, for_test: bool = False, dic: dict = None) -> Row:
     '''
     文章の不要語の除去，正規化，形態素解析を行い，結果としてラベル(年齢/性別)とデータのタプルを返す．
     タプルじゃなくてRowなどにして文字列アクセスするようにした方が後々見やすい気がする．
@@ -43,16 +43,16 @@ def preprocess(row: Row, n: int = 10, min_freq: int = 1, for_test: bool = False,
     sex = row['sex']
 
     # feature_row = Row(('age', age), ('sex', sex), ('feat', morph))
-    preprocessed = (age, sex, cleaned_nodes)
+    preprocessed = Row(age = age, sex = sex, nodes = cleaned_nodes)
 
     return preprocessed
 
-def convert_row_to_feature_vec(row: tuple, dic: dict) -> tuple:
+def convert_row_to_feature_vec(row: tuple, dic: dict) -> Row:
     '''
     一行のデータを特徴量化するコード．
     '''
     dim = len(dic)
-    nodes = row[2]
+    nodes = row['nodes']
     terms = [node[0] for node in nodes]
     vecs = []
     for term in terms:
@@ -64,7 +64,7 @@ def convert_row_to_feature_vec(row: tuple, dic: dict) -> tuple:
             vecs.append(vec)
     # TODO: Add some features
     
-    return (row[0], row[1], vecs)
+    return Row(age = row['age'], sex = row['sex'], feature = vecs)
 
 # Unused
 # def update_dictionary(nodes: list) -> None:
@@ -89,9 +89,9 @@ def convert_df_to_feature(df: DataFrame, n: int = 10, min_freq: int = 1, for_tes
     # 並列処理の時にはglobal変数の更新はうまくいかないっぽい．
     # https://stackoverflow.com/questions/44921837/how-to-update-a-global-variable-inside-rdd-map-operation
     if not for_test:
-        def get_vocab(x: tuple) -> list:
+        def get_vocab(row: Row) -> list:
             # (age, sex, clean_nodes)
-            nodes = x[2]
+            nodes = row['nodes']
             return [node[0] for node in nodes]
         vocab = preproc_rdd.map(
             lambda x:  get_vocab(x)
