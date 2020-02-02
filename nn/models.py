@@ -9,7 +9,7 @@ class MLP(nn.Module):
         self.out_dim = out_dim
         self.layers = nn.Sequential(
             nn.Linear(input_dim, num_hidden),
-            nn.BatchNorm1d(num_hidden)
+            nn.BatchNorm1d(num_hidden),
             nn.ReLU(),
             nn.Linear(num_hidden, out_dim)
         )
