@@ -26,8 +26,7 @@ def to_morph(sentence: str) -> list:
 
 def preprocess(row: Row, n: int = 10, min_freq: int = 1, for_test: bool = False, dic: dict = None) -> Row:
     '''
-    文章の不要語の除去，正規化，形態素解析を行い，結果としてラベル(年齢/性別)とデータのタプルを返す．
-    タプルじゃなくてRowなどにして文字列アクセスするようにした方が後々見やすい気がする．
+    文章の不要語の除去，正規化，形態素解析を行い，結果としてラベル(年齢/性別)とデータのRowを返す．
     '''
     sentence = row['sentence']
     clean_text = clearner.clean_text(sentence)

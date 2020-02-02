@@ -16,9 +16,6 @@ def lr_example():
     df.show(3)
 
     converted = featurizer.convert_df_to_feature(df, n_common, min_freq)
-    converted.foreach(
-        lambda row: print(row)
-    )
     converted = converted.map(
         # (age, sex, feature)
         lambda row: LabeledPoint(row['age'], concat_vectors(row['feature']))
