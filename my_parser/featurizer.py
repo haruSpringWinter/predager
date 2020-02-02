@@ -56,12 +56,14 @@ def convert_row_to_feature_vec(row: tuple, dic: dict) -> Row:
     terms = [node[0] for node in nodes]
     vecs = []
     for term in terms:
-        # いくつかの単語が登録されずにエラーを起こすのでif文でフィルタリングする
+        # いくつかの単語が登録されずにエラーを起こすので try-catchでやり過ごす (なぜかunicode文字列として認識されているっぽい)
         # one-hotエンコーディング
-        if term in dic:
+        try:
             vec = [0 for i in range(dim)]
             vec[dic.token2id[term]] += 1
             vecs.append(vec)
+        except Exception as e:
+            pass
     # TODO: Add some features
     
     return Row(age = row['age'], sex = row['sex'], feature = vecs)
