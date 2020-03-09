@@ -5,7 +5,7 @@ services:
     image: predager_main
     build:
       context: ./Dockerfiles
-    # なぜかDockerfileで環境変数設定すると実行時エラーになる
+    # なぜかDockerfileで環境変数設定すると実行時エラーになるのでexportで対応する
     command: >
       bash -c "export PYSPARK_PYTHON=/usr/bin/python3 && 
       python3 -u linear_regression_example.py"
