@@ -82,7 +82,7 @@ def convert_df_to_feature(df: DataFrame, n: int = 10, min_freq: int = 1, for_tes
     preproc_rdd = df.rdd.filter(
         lambda row: row['sentence'] != None
     ).map(
-        # TODO: preprocの結果をタプルで返していてアクセスの見通しが悪いのでRowに保存するようにする
+        # TODO: preprocessなどのコードはhandlersとして登録して自由に処理を切り替えられるようにする (pyTorchのtransforms的な方法)
         lambda row: preprocess(row, n, min_freq, for_test, dic)
     )
 
