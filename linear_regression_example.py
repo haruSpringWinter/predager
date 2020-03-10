@@ -10,7 +10,7 @@ def lr_example():
     n_common = 10
 
     pwd = os.path.dirname(os.path.abspath(__file__))
-    path = pwd + '/example_data/20190528sentences_data_integrated.csv'
+    path = pwd + '/example_data/twitter_2020-03-10.csv'
     print(path)
     df = csv_parser.load_as_df(path)
     df.show(3)
