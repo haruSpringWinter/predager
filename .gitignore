@@ -117,3 +117,6 @@ dmypy.json
 
 # Large files
 wnjpn.db 
+
+# Pycharm
+.idea/
