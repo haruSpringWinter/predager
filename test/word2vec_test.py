@@ -14,4 +14,3 @@ if __name__ == '__main__':
             print(result)
     else:
         print("入力された単語が辞書に存在しませんでした．")
-
