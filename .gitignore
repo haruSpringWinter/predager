@@ -120,3 +120,6 @@ wnjpn.db
 
 # Pycharm
 .idea/
+
+# word2vec param
+param/word2vec
