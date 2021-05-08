@@ -19,8 +19,8 @@ ss = SparkSession(sc).builder.master('local[*]').getOrCreate()
 twitter_schema = StructType([
     StructField('age', IntegerType(), False),
     StructField('sex', StringType(), False),
-    StructField('sentence', StringType(), False),
-    StructField('url', StringType(), False)
+    StructField('sentence', StringType(), False)
+    # StructField('url', StringType(), False)
 ])
 
 def load_as_df(path: str) -> DataFrame:
