@@ -34,7 +34,7 @@ class Word2VecFeaturizer:
             result_vec = sum_vec / cnt
         return row[0], result_vec.tolist()
 
-    def featurize(self, df:DataFrame):
+    def featurize(self, df:DataFrame) -> DataFrame:
         if self.wc_list is None:
             self.wc_list = ["名詞", "形容詞", "動詞"]
         return df.rdd.map(lambda x: self.gen_vec(x)).toDF(schema=["label", "features"])
