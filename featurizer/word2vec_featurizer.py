@@ -1,36 +1,46 @@
-import pandas as pd
 import numpy as np
 from gensim.models import KeyedVectors
+from pyspark.sql import DataFrame, SparkSession
 import MeCab
 
-
-def featurize(data_path:str, save:bool = False, saved_path:str = ""):
-    model = KeyedVectors.load_word2vec_format("../models/embed/entity_vector.model.bin", binary=True)
-    word2vec = model.wv
+def genVec(data_path, row, wc_list):
+    model = KeyedVectors.load_word2vec_format(data_path, binary=True)
     mecab = MeCab.Tagger('-Ochasen')
-    mecab.parse('')
-    df = pd.read_csv(data_path)
-    age_df = df['age']
-    sex_df = df['sex']
-    sentence_df = df['sentence']
-    vec_list = []
-    for sentence in sentence_df:
-        cnt = 0
-        sum_vec = np.array([0.0] * 200)
-        result_vec = sum_vec
-        node = mecab.parseToNode(sentence)
-        while node:
-            word = node.surface
-            if word in word2vec.vocab:
-                cnt += 1
-                sum_vec += word2vec.get_vector(word)
-            node = node.next
-        if cnt != 0:
-            result_vec = sum_vec / cnt
-        vec_list.append(result_vec)
-    result_df = pd.DataFrame({
-        'age': age_df,
-        'sex': sex_df,
-        'feature': vec_list
-    })
-    print(result_df)
+    cnt = 0
+    sum_vec = np.array([])
+    result_vec = sum_vec
+    node = mecab.parseToNode(row[1])
+    vc_list = model.index_to_key
+    while node:
+        word = node.surface
+        word_class = node.feature.split(",")[0]
+        if word in vc_list and word_class in wc_list:
+            cnt += 1
+            if cnt == 1:
+                sum_vec = model.get_vector(word).copy()
+            else:
+                sum_vec += model.get_vector(word)
+        node = node.next
+    if cnt != 0:
+        result_vec = sum_vec / cnt
+    return row[0], result_vec.tolist()
+
+def featurize(data_path:str, df:DataFrame, wc_list=None):
+    if wc_list is None:
+        wc_list = ["名詞", "形容詞", "動詞"]
+    return df.rdd.map(lambda x: genVec(data_path, x, wc_list)).toDF(schema=["label", "features"])
+
+if __name__ == '__main__':
+    spark = SparkSession.builder\
+        .appName('Spark SQL and DataFrame')\
+        .getOrCreate()
+    df = spark.createDataFrame(
+        [(1, "友達が作ってくれたビネの白ドレス可愛すぎてたまらん😍"),
+         (0, "できればダブりたくないが初期の方のLRは避けたい"),
+         (0, "だから一生孤独でも構わんよ親にも作れと言われているけど"),
+         ],
+        ("label", "sentence")
+    )
+    datapath = "../param/word2vec/entity_vector/entity_vector.model.bin"
+    df = featurize(datapath, df)
+    df.show(3)
