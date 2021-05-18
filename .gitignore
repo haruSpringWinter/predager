@@ -123,3 +123,6 @@ wnjpn.db
 
 # word2vec param
 param/word2vec
+
+# BERT param
+param/bert
