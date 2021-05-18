@@ -1,23 +1,21 @@
 from pyspark.sql import DataFrame, SparkSession
 import MeCab
 from sklearn.feature_extraction.text import TfidfVectorizer
+from gensim.corpora import Dictionary
 
 
-class TfidfFeaturizer:
-    spark = None
+class OneHotFeaturizer:
 
-    def __init__(self, sc):
-        self.spark = sc
+    global_dict = Dictionary()
 
-    def featurize(self, df:DataFrame) -> DataFrame:
-        data_list = df.rdd.collect()
-        label_list = []
+    def featurize(df:DataFrame) -> DataFrame:
+        label_list = df.rdd.map(lambda r: r[0]).collect()
+        sentence_list = df.rdd.map(lambda r: r[1]).collect()
         mecab = MeCab.Tagger('-Ochasen')
         mod_list = []
-        for data in data_list:
-            label_list.append(data[0])
+        for sentence in sentence_list:
             tmp_list = []
-            node = mecab.parseToNode(data[1])
+            node = mecab.parseToNode(sentence)
             while node:
                 word = node.surface
                 tmp_list.append(word)
@@ -27,7 +25,7 @@ class TfidfFeaturizer:
         vectorizer = TfidfVectorizer()
         tfidf_mat = vectorizer.fit_transform(mod_list)
         zip_list = zip(label_list, tfidf_mat.toarray().tolist())
-        new_df = self.spark.createDataFrame(
+        new_df = spark.createDataFrame(
             zip_list,
             ("label", "features")
         )
@@ -44,6 +42,5 @@ if __name__ == '__main__':
          ],
         ("label", "sentence")
     )
-    featurizer = TfidfFeaturizer(spark)
-    result_df = featurizer.featurize(df)
+    result_df = OneHotFeaturizer.featurize(df)
     result_df.show(3)

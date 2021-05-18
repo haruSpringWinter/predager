@@ -7,37 +7,46 @@ import MeCab
 class Word2VecFeaturizer:
     data_path = ''
     wc_list = []
+    spark = None
 
-    def __init__(self, path, wc=None):
+    def __init__(self, sc, path, wc=None):
+        self.spark = sc
         self.data_path = path
         self.wc_list = wc
 
-    def gen_vec(self, row):
+    def featurize(self, df):
         model = KeyedVectors.load_word2vec_format(self.data_path, binary=True)
         mecab = MeCab.Tagger('-Ochasen')
-        cnt = 0
+        data_list = df.rdd.collect()
         sum_vec = np.array([])
-        result_vec = sum_vec
-        node = mecab.parseToNode(row[1])
-        vc_list = model.index_to_key
-        while node:
-            word = node.surface
-            word_class = node.feature.split(",")[0]
-            if word in vc_list and word_class in self.wc_list:
-                cnt += 1
-                if cnt == 1:
-                    sum_vec = model.get_vector(word).copy()
-                else:
-                    sum_vec += model.get_vector(word)
-            node = node.next
-        if cnt != 0:
-            result_vec = sum_vec / cnt
-        return row[0], result_vec.tolist()
+        label_list = []
+        vec_list = []
+        for data in data_list:
+            node = mecab.parseToNode(data[1])
+            vc_list = model.index_to_key
+            cnt = 0
+            while node:
+                word = node.surface
+                word_class = node.feature.split(",")[0]
+                if word in vc_list and (self.wc_list is None or word_class in self.wc_list):
+                    cnt += 1
+                    if cnt == 1:
+                        sum_vec = model.get_vector(word).copy()
+                    else:
+                        sum_vec += model.get_vector(word)
+                node = node.next
+            if cnt != 0:
+                label_list.append(data[0])
+                result_vec = sum_vec / cnt
+                vec_list.append(result_vec.tolist())
 
-    def featurize(self, df:DataFrame) -> DataFrame:
-        if self.wc_list is None:
-            self.wc_list = ["名詞", "形容詞", "動詞"]
-        return df.rdd.map(lambda x: self.gen_vec(x)).toDF(schema=["label", "features"])
+        zip_list = zip(label_list, vec_list)
+        new_df = self.spark.createDataFrame(
+            zip_list,
+            ("label", "features")
+        )
+        return new_df
+
 
 if __name__ == '__main__':
     spark = SparkSession.builder\
@@ -51,6 +60,6 @@ if __name__ == '__main__':
         ("label", "sentence")
     )
     datapath = "../param/word2vec/entity_vector/entity_vector.model.bin"
-    wv = Word2VecFeaturizer(datapath)
+    wv = Word2VecFeaturizer(spark, datapath)
     df = wv.featurize(df)
     df.show(3)
