@@ -1,30 +1,48 @@
 from pyspark.sql import DataFrame, SparkSession
 import MeCab
 from sklearn.feature_extraction.text import TfidfVectorizer
+from gensim.corpora import Dictionary
 
 
-class TfidfFeaturizer:
-    def featurize(df:DataFrame) -> DataFrame:
-        label_list = df.rdd.map(lambda r: r[0]).collect()
-        sentence_list = df.rdd.map(lambda r: r[1]).collect()
+class OneHotFeaturizer():
+
+    global_dict = Dictionary()
+    spark = None
+
+    def __init__(self, sc):
+        self.spark = sc
+
+    def featurize(self, df:DataFrame) -> DataFrame:
+        data_list = df.rdd.collect()
         mecab = MeCab.Tagger('-Ochasen')
-        mod_list = []
-        for sentence in sentence_list:
+        label_list = []
+        wakati_list = []
+        for data in data_list:
             tmp_list = []
-            node = mecab.parseToNode(sentence)
+            node = mecab.parseToNode(data[1])
             while node:
                 word = node.surface
                 tmp_list.append(word)
                 node = node.next
-            modified_sentence = ' '.join(tmp_list)
-            mod_list.append(modified_sentence)
-        vectorizer = TfidfVectorizer()
-        tfidf_mat = vectorizer.fit_transform(mod_list)
-        zip_list = zip(label_list, tfidf_mat.toarray().tolist())
+            if len(tmp_list) != 0:
+                label_list.append(data[0])
+                wakati_list.append(tmp_list)
+
+        self.global_dict.add_documents(wakati_list)
+        dim = len(self.global_dict)
+        vec_list = []
+        for wakati in wakati_list:
+            vec = [0 for _ in range(dim)]
+            for word in wakati:
+                vec[self.global_dict.token2id[word]] = 1
+            vec_list.append(vec)
+        zip_list = zip(label_list, vec_list)
         new_df = spark.createDataFrame(
             zip_list,
             ("label", "features")
         )
+        for v in vec_list:
+            print(v)
         return new_df
 
 if __name__ == '__main__':
@@ -38,5 +56,6 @@ if __name__ == '__main__':
          ],
         ("label", "sentence")
     )
-    result_df = TfidfFeaturizer.featurize(df)
+    oneHot = OneHotFeaturizer(spark)
+    result_df = oneHot.featurize(df)
     result_df.show(3)
