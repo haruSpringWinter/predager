@@ -3,7 +3,7 @@ import numpy as np
 from pyspark.mllib.regression import LinearRegressionWithSGD, LabeledPoint
 from pyspark.mllib.linalg import Vectors
 from parser import csv_parser
-from preprocess import featurizer
+from preprocessor import featurizer
 from schema.twitter_schema import twitter_schema
 
 
