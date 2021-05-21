@@ -1,8 +1,11 @@
-import os, sys
+import os
 import numpy as np
 from pyspark.mllib.regression import LinearRegressionWithSGD, LabeledPoint
 from pyspark.mllib.linalg import Vectors
-from my_parser import featurizer, csv_parser
+from parser import csv_parser
+from preprocess import featurizer
+from schema.twitter_schema import twitter_schema
+
 
 # 文章の文字数から年齢を予測するexample
 def lr_example():
@@ -12,7 +15,7 @@ def lr_example():
     pwd = os.path.dirname(os.path.abspath(__file__))
     path = pwd + '/example_data/twitter_2020-03-10_slim.csv'
     print(path)
-    df = csv_parser.load_as_df(path)
+    df = csv_parser.load_as_df(path, twitter_schema)
     df.show(3)
 
     converted = featurizer.convert_df_to_feature(df, n_common, min_freq).filter(

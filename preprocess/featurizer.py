@@ -1,10 +1,9 @@
 import MeCab
-import numpy as np
 from pyspark import RDD
 from pyspark.sql import DataFrame, Row
 from gensim.corpora import Dictionary
 
-from . import normalizer, stopwords_handler, clearner
+from preprocess import clearner, normalizer, stopwords_handler
 
 global_dict = Dictionary()
 
@@ -126,10 +125,11 @@ def convert_df_to_feature(df: DataFrame, n: int = 10, min_freq: int = 1, for_tes
 if __name__ == "__main__":
     import os
     pwd = os.path.dirname(os.path.abspath(__file__))
-    from .csv_parser import load_as_df
+    from parser.csv_parser import load_as_df
+    from schema.twitter_schema import twitter_schema
 
     path = pwd + '/../example_data/20190528sentences_data_integrated.csv'
-    df = load_as_df(path)
+    df = load_as_df(path, twitter_schema)
     df.show(3)
 
     converted = convert_df_to_feature(df)
