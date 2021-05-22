@@ -1,4 +1,3 @@
-import numpy as np
 import sys
 func_path = '../parser/'
 sys.path.append(func_path)
