@@ -3,7 +3,7 @@ from pyspark import RDD
 from pyspark.sql import DataFrame, Row
 from gensim.corpora import Dictionary
 
-from preprocessor import clearner, normalizer, stopwords_handler
+from preprocess import clearner, normalizer, stopwords_handler
 
 global_dict = Dictionary()
 
