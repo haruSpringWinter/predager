@@ -5,7 +5,7 @@ from pyspark.ml.linalg import Vectors
 from preprocess.preprocessor import shape_df
 
 
-class OneHotFeaturizer():
+class EmojiKaomojiCountFeaturizer():
 
     global_dict = Dictionary()
     spark = None
@@ -21,7 +21,8 @@ class OneHotFeaturizer():
         for data in data_list:
             tmp_list = []
             node_list = data[1]
-            for word in node_list:
+            for node in node_list:
+                word = node[0]
                 tmp_list.append(word)
             if len(tmp_list) != 0:
                 label_list.append(data[0])
