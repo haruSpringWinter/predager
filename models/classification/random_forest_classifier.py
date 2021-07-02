@@ -9,6 +9,7 @@ from pyspark.ml import Pipeline
 from pyspark.ml.classification import DecisionTreeClassifier
 from pyspark.ml.feature import StringIndexer, VectorIndexer
 from pyspark.ml.evaluation import MulticlassClassificationEvaluator
+from pyspark.ml.classification import RandomForestClassifier
 
 
 if __name__ == '__main__':
@@ -22,19 +23,20 @@ if __name__ == '__main__':
     df = load_as_df(dataPath, twitter_schema)
     converted_df = shape_df(spark, df).drop("age")
     converted_df.show(3)
-    # model_path = "../../param/word2vec/entity_vector/entity_vector.model.bin"
-    # wv = Word2VecFeaturizer(spark, model_path)
-    # feat_df = wv.featurize(converted_df)
-    model_path = "../../param/bert/Japanese_L-24_H-1024_A-16_E-30_BPE_WWM_transformers"
-    bert = BertFeaturizer(spark, model_path)
-    feat_df = bert.featurize(converted_df)
+    model_path = "../../param/word2vec/entity_vector/entity_vector.model.bin"
+    wv = Word2VecFeaturizer(spark, model_path)
+    feat_df = wv.featurize(converted_df)
+    # model_path = "../../param/bert/Japanese_L-24_H-1024_A-16_E-30_BPE_WWM_transformers"
+    # bert = BertFeaturizer(spark, model_path)
+    # feat_df = bert.featurize(converted_df)
     # Split the data into training and test sets (30% held out for testing)
-    (trainingData, testData) = feat_df.randomSplit([0.7, 0.3], seed=2)
+    (trainingData, testData) = feat_df.randomSplit([0.7, 0.3], seed=3)
 
-    dt = DecisionTreeClassifier(labelCol="label", featuresCol="features", maxDepth=6)
+    # Train a RandomForest model.
+    rf = RandomForestClassifier(labelCol="label", featuresCol="features", numTrees=25)
 
     # Train model.  This also runs the indexers.
-    model = dt.fit(trainingData)
+    model = rf.fit(trainingData)
 
     # Make predictions.
     predictions = model.transform(testData)

@@ -5,7 +5,11 @@ from schema.twitter_schema import twitter_schema
 from preprocess.preprocessor import shape_df
 from featurizer.word2vec_featurizer import Word2VecFeaturizer
 from featurizer.bert_featurizer import BertFeaturizer
+from pyspark.ml import Pipeline
+from pyspark.ml.classification import DecisionTreeClassifier
+from pyspark.ml.feature import StringIndexer, VectorIndexer
 from pyspark.ml.evaluation import MulticlassClassificationEvaluator
+
 
 if __name__ == '__main__':
 
@@ -24,20 +28,19 @@ if __name__ == '__main__':
     model_path = "../../param/bert/Japanese_L-24_H-1024_A-16_E-30_BPE_WWM_transformers"
     bert = BertFeaturizer(spark, model_path)
     feat_df = bert.featurize(converted_df)
-    (training, test) = feat_df.randomSplit([0.7, 0.3], seed=3)
-    lr = LogisticRegression(maxIter=30, regParam=0.0001, elasticNetParam=0.2)
+    # Split the data into training and test sets (30% held out for testing)
+    (trainingData, testData) = feat_df.randomSplit([0.7, 0.3], seed=2)
 
-    # Fit the model
-    lrModel = lr.fit(training)
+    dt = DecisionTreeClassifier(labelCol="label", featuresCol="features", maxDepth=6)
 
-    summary = lrModel.summary
-    print("training accuracy: "+str(summary.accuracy))
+    # Train model.  This also runs the indexers.
+    model = dt.fit(trainingData)
 
     # Make predictions.
-    predictions = lrModel.transform(test)
+    predictions = model.transform(testData)
 
     # Select example rows to display.
-    predictions.select("prediction", "label", "features").show()
+    predictions.select("prediction", "label", "features").show(5)
 
     # Select (prediction, true label) and compute test error
     evaluator = MulticlassClassificationEvaluator(
