@@ -1,13 +1,13 @@
 {
   "spark": {
     "executor": {
-      "memory": "4g"
+      "memory": "8g"
     },
     "driver": {
-      "memory": "4g"
+      "memory": "8g"
     },
     "cores": {
-      "max": "4"
+      "max": "8"
     }
   }
 }

@@ -1,7 +1,7 @@
 import dacite, json
 from dataclasses import dataclass
 
-PATH_TO_CONF = '/app/conf/conf.json'
+PATH_TO_CONF = '../../conf/conf.json'
 
 @dataclass
 class SparkSetting:

@@ -3,7 +3,7 @@ import numpy as np
 from pyspark.mllib.regression import LinearRegressionWithSGD, LabeledPoint
 from pyspark.mllib.linalg import Vectors
 from parser import csv_parser
-from preprocessor import featurizer
+from preprocess import preprocessor
 from schema.twitter_schema import twitter_schema
 
 
@@ -18,7 +18,7 @@ def lr_example():
     df = csv_parser.load_as_df(path, twitter_schema)
     df.show(3)
 
-    converted = featurizer.convert_df_to_feature(df, n_common, min_freq).filter(
+    converted = preprocessor.convert_df_to_feature(df, n_common, min_freq).filter(
         lambda row: row['age'] is not None and row['feature'] is not None
     )
     converted = converted.map(

@@ -15,6 +15,14 @@ conf = SparkConf().setAll(
 sc = SparkContext(conf=conf)
 ss = SparkSession(sc).builder.master('local[*]').getOrCreate()
 
+def convert_str_to_int(sex: str) -> int:
+    if sex == 'male':
+        return 0
+    elif sex == 'female':
+        return 1
+    else:
+        return 2
+
 
 def load_as_df(path: str, schema: StructType) -> DataFrame:
     df = ss.read.csv(path, header=True, schema=schema)

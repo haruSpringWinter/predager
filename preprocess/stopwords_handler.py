@@ -31,7 +31,7 @@ def remove_stopnodes(nodes: list, swlist: list = None) -> list:
     global stopwords
     if swlist == None:
         swlist = stopwords
-    nodes = [node for node in nodes if node[0] not in swlist]
+    nodes = [node for node in nodes if node not in swlist]
     return nodes
  
 
