@@ -21,26 +21,26 @@ if __name__ == '__main__':
     # dataPath = '../../example_data/twitter/20190528sentences_data_integrated.csv'
     dataPath = '../../example_data/twitter_2020-03-10.csv'
     df = load_as_df(dataPath, twitter_schema)
-    converted_df = shape_df(spark, df).drop("age")
+    converted_df = shape_df(spark, df, 'nagisa').drop("age")
     converted_df.show(3)
     # model_path = "../../param/word2vec/entity_vector/entity_vector.model.bin"
     # wv = Word2VecFeaturizer(spark, model_path)
     # feat_df = wv.featurize(converted_df)
     model_path = "../../param/word2vec/twitter_model/w2v_gensim/word2vec_tweet.model"
     wv_tweet = Word2VecFeaturizer(spark, model_path, False)
-    # feat_df = wv_tweet.featurize(converted_df)
+    feat_df = wv_tweet.featurize(converted_df)
     # model_path = "../../param/bert/Japanese_L-24_H-1024_A-16_E-30_BPE_WWM_transformers"
     # bert = BertFeaturizer(spark, model_path)
     # Split the data into training and test sets (30% held out for testing)
     # multi_feat = MultiFeaturizer(spark, [wv, wv_tweet])
     # feat_df = multi_feat.featurize(converted_df)
-    converted_df2 = shape_df(spark, df, 'nagisa', ['補助記号']).drop("age")
-    tfidf = TfidfFeaturizer(spark)
+    # converted_df2 = shape_df(spark, df, 'nagisa', ['補助記号']).drop("age")
+    # tfidf = TfidfFeaturizer(spark)
     # feat_df = tfidf.featurize(converted_df2)
     # onehot = OneHotFeaturizer(spark)
     # feat_df = onehot.featurize(converted_df)
-    multi_feat = MultiFeaturizer(spark, [wv_tweet, tfidf], [converted_df, converted_df2])
-    feat_df = multi_feat.featurize()
+    # multi_feat = MultiFeaturizer(spark, [wv_tweet, tfidf], [converted_df, converted_df2])
+    # feat_df = multi_feat.featurize()
     (trainingData, testData) = feat_df.randomSplit([0.8, 0.2], seed=3)
 
     dim = len(feat_df.rdd.collect()[0][1])
